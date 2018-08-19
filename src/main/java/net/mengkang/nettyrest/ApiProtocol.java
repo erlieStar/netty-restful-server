@@ -136,6 +136,11 @@ public class ApiProtocol {
      * @param uri
      */
     private void parseEndpoint(String uri) {
+
+        // 这个是获取url地址
+        // 如：http://localhost:8080/user/1/album/10?build=103&test=100
+        // endpoint为http://localhost:8080/user/1/album/10
+        // 感觉if语句没有必要
         String endpoint = uri.split("\\?")[0];
         if (endpoint.endsWith("/")) {
             endpoint = endpoint.substring(0, endpoint.length());
@@ -162,6 +167,9 @@ public class ApiProtocol {
     }
 
     private void setIp(ChannelHandlerContext ctx, HttpRequest req) {
+        // 文档参考地址：https://baike.baidu.com/item/X-Forwarded-For/3593639
+        // X-Forwarded-For:简称XFF头，它代表客户端，也就是HTTP的请求端真实的IP，
+        // 只有在通过了HTTP 代理或者负载均衡服务器时才会添加该项
         String clientIP = (String) req.headers().get("X-Forwarded-For");
         if (clientIP == null) {
             InetSocketAddress remoteSocket = (InetSocketAddress) ctx.channel().remoteAddress();

@@ -40,6 +40,7 @@ public class Api {
             if (strings[i].length() == 0) {
                 continue;
             }
+            // 正则表达式开始
             stringBuilder.append("/");
             if (strings[i].startsWith(":")) {
                 parameterNames.add(strings[i].substring(1));
