@@ -44,6 +44,9 @@ public class Api {
             stringBuilder.append("/");
             if (strings[i].startsWith(":")) {
                 parameterNames.add(strings[i].substring(1));
+                // ()标记一个子表达式的开始和结束位置
+                // 匹配所有字符除了/
+                // +匹配前面的子表达式一次或多次
                 stringBuilder.append("([^/]+)");
             } else {
                 stringBuilder.append(strings[i]);

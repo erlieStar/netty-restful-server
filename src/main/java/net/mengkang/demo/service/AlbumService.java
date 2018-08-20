@@ -14,6 +14,7 @@ public class AlbumService extends BaseService {
         super(apiProtocol);
     }
 
+    // 执行get方法
     public Album get(int id, int uid) {
         User   user  = new User(uid, "mengkang", 25);
         String cover = "http://static.mengkang.net/view/images/avatar/1.jpg";

@@ -90,10 +90,16 @@ public class ApiProtocol {
         return parameters;
     }
 
+    // 访问的url是http://localhost:8080/user/1/album/10?build=103
+    // /user/:uid/album/:aid
+    // 打印出来的log为
+    // key uid, params [1]
+    // key aid, params [10]
     private void addParameter(String key, String param) {
         List<String> params = new ArrayList<>();
         params.add(param);
         this.parameters.put(key, params);
+        logger.info("key {}, params {}",key, params);
     }
 
     public String getPostBody() {
@@ -118,12 +124,18 @@ public class ApiProtocol {
         logger.info(uri);
         this.method = req.method();
 
+        // 获取路径匹配符中的参数
         parseEndpoint(uri);
+        // 设置客户端ip和服务端ip
         setIp(ctx, req);
+        // 对url进行decode（解码）
         queryStringHandler(uri);
+        // 如果是post请求获取post请求的值
         requestParametersHandler(req);
         requestBodyHandler(msg);
 
+        // 将parameters中有的参数设置到ApiProtocol这个对象中
+        // 并从parameters中移除
         if (this.parameters.size() > 0) {
             setFields();
         }
@@ -151,12 +163,16 @@ public class ApiProtocol {
 
         for (Map.Entry<String, Api> entry : set) {
             Api api = entry.getValue();
+            // 简单工厂创建正则表达式，^和$是匹配字符串的开头和结尾
             Pattern pattern = Pattern.compile("^" + api.getRegex() + "$");
             Matcher matcher = pattern.matcher(endpoint);
+            // url是否匹配到正则表达式
             if (matcher.find()) {
                 this.api = api.getName();
+                // 返回匹配到的组数
                 if (matcher.groupCount() > 0) {
                     for (int i = 0; i < matcher.groupCount(); i++) {
+                        // matcher.group返回第i+1组匹配到到的字符串
                         addParameter(api.getParameterNames().get(i), matcher.group(i + 1));
                     }
                 }
@@ -193,6 +209,7 @@ public class ApiProtocol {
             Field field = fields[i];
             String filedName = field.getName();
 
+            // 遍历自己的属性名字
             if (filedName.equals("logger")
                     || filedName.equals("method")
                     || filedName.equals("parameters")
@@ -237,6 +254,10 @@ public class ApiProtocol {
 
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(uri);
         if (queryStringDecoder.parameters().size() > 0) {
+            // 访问的url是http://localhost:8080/user/1/album/10?build=103
+            // queryStringDecoder.parameters() {build=[103]}
+            // uid=[1],aid=[10],build=[103]
+            logger.info("queryStringDecoder.parameters() {}", queryStringDecoder.parameters());
             this.parameters.putAll(queryStringDecoder.parameters());
         }
     }

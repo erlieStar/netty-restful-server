@@ -27,10 +27,12 @@ public class ApiHandler {
     public static byte[] transfer(ChannelHandlerContext ctx, Object msg) {
         ApiProtocol apiProtocol = new ApiProtocol(ctx, msg);
 
+        // 没有url
         if (apiProtocol.getEndpoint() == null) {
             return encode(ErrorHandler.error(StatusCode.API_CAN_NOT_BE_NULL));
         }
 
+        // 找不到匹配的路径
         if (apiProtocol.getApi() == null) {
             return encode(ErrorHandler.error(StatusCode.API_NOT_FOUND));
         }
@@ -58,14 +60,18 @@ public class ApiHandler {
         Object   result = null;
 
         Api api = ApiRoute.apiMap.get(apiName);
+
+        // 没有找到实现
         if (api == null) {
             return ErrorHandler.error(StatusCode.API_NOT_FOUND);
         }
 
+        // 版本低
         if (apiProtocol.getBuild() < api.getBuild()){
             return ErrorHandler.error(StatusCode.VERSION_IS_TOO_LOW);
         }
 
+        // 不支持这种类型的方法
         if(api.getHttpMethod() != null && !api.getHttpMethod().contains(apiProtocol.getMethod().toString().toLowerCase())){
             return ErrorHandler.error(StatusCode.REQUEST_MODE_ERROR);
         }
